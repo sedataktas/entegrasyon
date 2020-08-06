@@ -92,3 +92,46 @@ type PriceAndInventory struct {
 		ListPrice float64 `json:"listPrice"`
 	} `json:"items"`
 }
+
+type Response struct {
+	BatchRequestID string `json:"batchRequestId"`
+}
+
+type BatchRequestResult struct {
+	BatchRequestID string `json:"batchRequestId"`
+	Items          []struct {
+		RequestItem struct {
+			Product struct {
+				Brand        string  `json:"brand"`
+				Barcode      string  `json:"barcode"`
+				Title        string  `json:"title"`
+				Description  string  `json:"description"`
+				CategoryName string  `json:"categoryName"`
+				ListPrice    float64 `json:"listPrice"`
+				SalePrice    float64 `json:"salePrice"`
+				CurrencyType string  `json:"currencyType"`
+				VatRate      int     `json:"vatRate"`
+				CargoCompany string  `json:"cargoCompany"`
+				Quantity     int     `json:"quantity"`
+				StockCode    string  `json:"stockCode"`
+				Images       []struct {
+					URL string `json:"url"`
+				} `json:"images"`
+				ProductMainID     string        `json:"productMainId"`
+				Gender            string        `json:"gender"`
+				DimensionalWeight int           `json:"dimensionalWeight"`
+				Attributes        []interface{} `json:"attributes"`
+				VariantAttributes []struct {
+					AttributeName  string `json:"attributeName"`
+					AttributeValue string `json:"attributeValue"`
+				} `json:"variantAttributes"`
+			} `json:"product"`
+		} `json:"requestItem"`
+		Status         string        `json:"status"`
+		FailureReasons []interface{} `json:"failureReasons"`
+	} `json:"items"`
+	Status           string `json:"status"`
+	CreationDate     int64  `json:"creationDate"`
+	LastModification int64  `json:"lastModification"`
+	SourceType       string `json:"sourceType"`
+	ItemCoun

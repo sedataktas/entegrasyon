@@ -1,0 +1,5 @@
+package trendyol
+
+func GetShipmentPackages() {
+
+}

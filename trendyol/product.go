@@ -16,7 +16,7 @@ const (
 )
 
 /*CreateProduct creates a product*/
-func CreateProduct(supplierID string, productInfo []byte) {
+func CreateProduct(supplierID string, productInfo []byte) BatchRequestResult {
 	url := "https://api.trendyol.com/sapigw/suppliers/" +
 		supplierID + "/v2/products"
 
@@ -31,7 +31,12 @@ func CreateProduct(supplierID string, productInfo []byte) {
 	if err != nil {
 		print(err)
 	}
-	fmt.Println(body)
+
+	var res Response
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+	json.Unmarshal(body, &res)
+
+	return getBatchRequestResult(supplierID, res.BatchRequestID)
 }
 
 /*UpdateProduct updates product infos*/
@@ -56,7 +61,7 @@ func UpdateProduct(supplierID string, productInfo []byte) {
 
 /*UpdateProductPriceAndInventory updates product's prica and inventory*/
 func UpdateProductPriceAndInventory(supplierID string,
-	priceandinventoryInfo []byte) {
+	priceandinventoryInfo []byte) BatchRequestResult {
 	url := "https://api.trendyol.com/sapigw/suppliers/" +
 		supplierID + "/products/price-and-inventory"
 
@@ -71,7 +76,8 @@ func UpdateProductPriceAndInventory(supplierID string,
 	if err != nil {
 		print(err)
 	}
-	fmt.Println(body)
+
+	return getBatchRequestResult(supplierID, res.BatchRequestID)
 }
 
 /*GetAllBrands gets all brands from trendyol api*/
@@ -109,6 +115,16 @@ func GetProviders() (providers []Provider) {
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 	json.Unmarshal(body, &providers)
 	return providers
+}
+
+func getBatchRequestResult(supplierID, batchRequestID string) (result BatchRequestResult) {
+	url := "https://api.trendyol.com/sapigw/suppliers/" +
+		supplierID + "/products/batch-requests/" + batchRequestID
+	body := makeGetRequest(url)
+
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+	json.Unmarshal(body, &result)
+	return result
 }
 
 func makeGetRequest(url string) []byte {
