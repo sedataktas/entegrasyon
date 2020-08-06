@@ -1,6 +1,7 @@
 package trendyol
 
 import (
+	"bytes"
 	"io/ioutil"
 	"net/http"
 
@@ -11,58 +12,30 @@ import (
 const (
 	allBrandsURL     = "https://api.trendyol.com/sapigw/brands"
 	allCategoriesURL = "https://api.trendyol.com/sapigw/product-categories"
+	allProvidersURL  = "https://api.trendyol.com/sapigw/shipment-providers"
 )
 
-// Brands stores Trendyol brands infos(trendyol response)
-type Brands struct {
-	Brands []Brand `json:"brands"`
-}
+func CreateProduct(supplierID string, productInfo []byte) {
+	url := "https://api.trendyol.com/sapigw/suppliers/" +
+		supplierID + "/v2/products"
 
-// Brand stores a Trendyol brand infos(trendyol response)
-type Brand struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
+	resp, err := http.Post(url, "applciation/json",
+		bytes.NewBuffer(productInfo))
+	if err != nil {
+		print(err)
+	}
 
-// AllCategories is a root for categories
-type AllCategories struct {
-	Categories []struct {
-		ID            int    `json:"id"`
-		Name          string `json:"name"`
-		SubCategories []struct {
-			ID            int           `json:"id"`
-			Name          string        `json:"name"`
-			ParentID      int           `json:"parentId"`
-			SubCategories []interface{} `json:"subCategories"`
-		} `json:"subCategories"`
-	} `json:"categories"`
-}
-
-// CategoryAttributes stores a Trendyol Category Attributes infos
-type CategoryAttributes struct {
-	ID                 int    `json:"id"`
-	Name               string `json:"name"`
-	DisplayName        string `json:"displayName"`
-	CategoryAttributes []struct {
-		CategoryID int `json:"categoryId"`
-		Attribute  struct {
-			ID   int    `json:"id"`
-			Name string `json:"name"`
-		} `json:"attribute"`
-		Required        bool `json:"required"`
-		AllowCustom     bool `json:"allowCustom"`
-		Varianter       bool `json:"varianter"`
-		Slicer          bool `json:"slicer"`
-		AttributeValues []struct {
-			ID   int    `json:"id"`
-			Name string `json:"name"`
-		} `json:"attributeValues"`
-	} `json:"categoryAttributes"`
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		print(err)
+	}
+	fmt.Println(body)
 }
 
 /*GetAllBrands gets all brands from trendyol api*/
 func GetAllBrands() (brands Brands) {
-	body := makeRequest(allBrandsURL)
+	body := makeGetRequest(allBrandsURL)
 
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 	json.Unmarshal(body, &brands)
@@ -71,7 +44,7 @@ func GetAllBrands() (brands Brands) {
 
 /*GetAllCategories gets all categories from trendyol api*/
 func GetAllCategories() (categories AllCategories) {
-	body := makeRequest(allCategoriesURL)
+	body := makeGetRequest(allCategoriesURL)
 
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 	json.Unmarshal(body, &categories)
@@ -80,16 +53,24 @@ func GetAllCategories() (categories AllCategories) {
 
 /*GetCategoryAttributes gets category attributes by categoryID from trendyol api*/
 func GetCategoryAttributes(categoryID string) (attributes CategoryAttributes) {
-	body := makeRequest("https://api.trendyol.com/sapigw/product-categories/" +
+	body := makeGetRequest("https://api.trendyol.com/sapigw/product-categories/" +
 		categoryID + "/attributes")
 
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 	json.Unmarshal(body, &attributes)
-	fmt.Println(attributes)
 	return attributes
 }
 
-func makeRequest(url string) []byte {
+/*GetCategoryAttributes gets category attributes by categoryID from trendyol api*/
+func GetProviders() (providers []Provider) {
+	body := makeGetRequest(allProvidersURL)
+
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+	json.Unmarshal(body, &providers)
+	return providers
+}
+
+func makeGetRequest(url string) []byte {
 	resp, err := http.Get(url)
 	if err != nil {
 		print(err)
