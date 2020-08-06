@@ -55,6 +55,7 @@ type Provider struct {
 	TaxNumber string `json:"taxNumber"`
 }
 
+// Product used when create or update product
 type Product struct {
 	Items []struct {
 		Barcode           string  `json:"barcode"`
@@ -79,5 +80,15 @@ type Product struct {
 			AttributeValueID     int    `json:"attributeValueId,omitempty"`
 			CustomAttributeValue string `json:"customAttributeValue,omitempty"`
 		} `json:"attributes"`
+	} `json:"items"`
+}
+
+// PriceAndInventory used when update price and inventory
+type PriceAndInventory struct {
+	Items []struct {
+		Barcode   string  `json:"barcode"`
+		Quantity  int     `json:"quantity"`
+		SalePrice float64 `json:"salePrice"`
+		ListPrice float64 `json:"listPrice"`
 	} `json:"items"`
 }

@@ -15,12 +15,53 @@ const (
 	allProvidersURL  = "https://api.trendyol.com/sapigw/shipment-providers"
 )
 
+/*CreateProduct creates a product*/
 func CreateProduct(supplierID string, productInfo []byte) {
 	url := "https://api.trendyol.com/sapigw/suppliers/" +
 		supplierID + "/v2/products"
 
 	resp, err := http.Post(url, "applciation/json",
 		bytes.NewBuffer(productInfo))
+	if err != nil {
+		print(err)
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		print(err)
+	}
+	fmt.Println(body)
+}
+
+/*UpdateProduct updates product infos*/
+func UpdateProduct(supplierID string, productInfo []byte) {
+	url := "https://api.trendyol.com/sapigw/suppliers/" +
+		supplierID + "/v2/products"
+
+	resp, err := http.NewRequest(http.MethodPut, url,
+		bytes.NewBuffer(productInfo))
+	if err != nil {
+		print(err)
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		print(err)
+	}
+	fmt.Println(body)
+
+}
+
+/*UpdateProductPriceAndInventory updates product's prica and inventory*/
+func UpdateProductPriceAndInventory(supplierID string,
+	priceandinventoryInfo []byte) {
+	url := "https://api.trendyol.com/sapigw/suppliers/" +
+		supplierID + "/products/price-and-inventory"
+
+	resp, err := http.Post(url, "applciation/json",
+		bytes.NewBuffer(priceandinventoryInfo))
 	if err != nil {
 		print(err)
 	}
@@ -61,7 +102,7 @@ func GetCategoryAttributes(categoryID string) (attributes CategoryAttributes) {
 	return attributes
 }
 
-/*GetCategoryAttributes gets category attributes by categoryID from trendyol api*/
+/*GetProviders gets providers from trendyol api*/
 func GetProviders() (providers []Provider) {
 	body := makeGetRequest(allProvidersURL)
 
