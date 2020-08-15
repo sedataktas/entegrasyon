@@ -134,4 +134,4 @@ type BatchRequestResult struct {
 	CreationDate     int64  `json:"creationDate"`
 	LastModification int64  `json:"lastModification"`
 	SourceType       string `json:"sourceType"`
-	ItemCoun
+}

@@ -2,11 +2,13 @@ package trendyol
 
 import (
 	"bytes"
+	"entegrasyon/templates"
 	"io/ioutil"
 	"net/http"
 
+	"fmt"
+
 	jsoniter "github.com/json-iterator/go"
-	"golang.org/x/exp/errors/fmt"
 )
 
 const (
@@ -14,6 +16,13 @@ const (
 	allCategoriesURL = "https://api.trendyol.com/sapigw/product-categories"
 	allProvidersURL  = "https://api.trendyol.com/sapigw/shipment-providers"
 )
+
+func GetLayout(w http.ResponseWriter, r *http.Request) {
+	err := templates.RenderInLayout(w, r, "pages-settings.html", nil)
+	if err != nil {
+		panic(err)
+	}
+}
 
 /*CreateProduct creates a product*/
 func CreateProduct(supplierID string, productInfo []byte) BatchRequestResult {
@@ -76,6 +85,10 @@ func UpdateProductPriceAndInventory(supplierID string,
 	if err != nil {
 		print(err)
 	}
+
+	var res BatchRequestResult
+	json := jsoniter.ConfigCompatibleWithStandardLibrary
+	json.Unmarshal(body, &res)
 
 	return getBatchRequestResult(supplierID, res.BatchRequestID)
 }
