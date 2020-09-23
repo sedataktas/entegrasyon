@@ -2,17 +2,16 @@ package templates
 
 import (
 	"bytes"
+	"entegrasyon/models"
 	"fmt"
 	"html/template"
-	"linkwind/app/models"
-	"log"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 
-	"github.com/getsentry/sentry-go"
 	"github.com/oxtoacart/bpool"
+	log "github.com/sirupsen/logrus"
 )
 
 const templatesDir = "templates/"
@@ -30,26 +29,20 @@ func init() {
 
 	layouts, err := listAllHtmlsRecursively(templatesDir + "layouts")
 	if err != nil {
-		sentry.CaptureException(err)
-		log.Fatal(err)
-	}
-
-	partials, err := listAllHtmlsRecursively(templatesDir + "partials")
-	if err != nil {
-		sentry.CaptureException(err)
 		log.Fatal(err)
 	}
 
 	layoutPath := path.Join(templatesDir, "layouts", "layout.html")
 
+	var files []string
+	files = append(files, layoutPath)
 	// Generate our templates map from our layouts/ and partials/ directories
+	var fileName string
 	for _, layout := range layouts {
-		fileName := filepath.Base(layout)
-		files := append(partials, layout)
-		files = append(files, layoutPath)
+		fileName = filepath.Base(layout)
+		files = append(files, layout)
 		templates[fileName] = template.Must(template.ParseFiles(files...))
 	}
-
 }
 
 // RenderInLayout is a wrapper around template.ExecuteTemplate.
@@ -57,22 +50,13 @@ func init() {
 // any errors resulting from populating the template.
 func RenderInLayout(
 	w http.ResponseWriter,
-	r *http.Request,
 	name string,
-	data models.BaseViewModelInterface) error {
+	data models.ViewModelInterface) error {
 
 	tmpl, ok := templates[name]
 	if !ok {
 		return fmt.Errorf("The template %s does not exist", name)
 	}
-	/*
-		userCtx := shared.GetUserFromContext(r)
-		customerCtx := shared.GetCustomerFromContext(r)
-
-		capitailizedPlatform := strings.Title(customerCtx.Platform)
-
-		data.SetLayout(capitailizedPlatform, customerCtx.Logo, customerCtx.Title)
-		data.SetSignedInUser(userCtx)*/
 
 	// Create a buffer to temporarily write to and check if any errors were encounted.
 	buf := bufpool.Get()

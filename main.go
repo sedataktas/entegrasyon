@@ -1,12 +1,10 @@
 package main
 
 import (
+	log "github.com/sirupsen/logrus"
 	"net/http"
-	"os"
 
 	"entegrasyon/trendyol"
-
-	"github.com/getsentry/sentry-go"
 )
 
 func main() {
@@ -17,7 +15,6 @@ func main() {
 	router.Handle(StaticFolderPath, http.StripPrefix(StaticFolderPath, staticFileServer))
 	router.HandleFunc("/", trendyol.GetLayout)
 	if err := http.ListenAndServe(":8080", router); err != nil {
-		sentry.CaptureException(err)
-		os.Exit(1)
+		log.Error(err)
 	}
 }

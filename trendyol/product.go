@@ -18,7 +18,7 @@ const (
 )
 
 func GetLayout(w http.ResponseWriter, r *http.Request) {
-	err := templates.RenderInLayout(w, r, "pages-settings.html", nil)
+	err := templates.RenderInLayout(w, "pages-settings.html", nil)
 	if err != nil {
 		panic(err)
 	}
